@@ -315,9 +315,14 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void)openInSystem:(NSURL*)url
 {
-    if ([[UIApplication sharedApplication] openURL:url] == NO) {
-        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
-        [[UIApplication sharedApplication] openURL:url];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+    // Deprecated openURL: returns NO / is a no-op on iOS 14+. Use the modern API
+    // so target=_system actually leaves the app (Safari / Files for PDFs).
+    UIApplication* app = [UIApplication sharedApplication];
+    if ([app respondsToSelector:@selector(openURL:options:completionHandler:)]) {
+        [app openURL:url options:@{} completionHandler:nil];
+    } else {
+        [app openURL:url];
     }
 }
 
