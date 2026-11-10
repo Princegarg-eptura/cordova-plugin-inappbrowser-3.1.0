@@ -217,7 +217,8 @@ static CDVWKInAppBrowser* instance = nil;
         if(appendUserAgent){
             userAgent = [userAgent stringByAppendingString: appendUserAgent];
         }
-        self.inAppBrowserViewController = [[CDVWKInAppBrowserViewController alloc] initWithUserAgent:userAgent prevUserAgent:[self.commandDelegate userAgent] browserOptions: browserOptions];
+        // shortcut: commandDelegate.userAgent gone in cordova-ios 6; upgrade fork when upstream drops this
+        self.inAppBrowserViewController = [[CDVWKInAppBrowserViewController alloc] initWithUserAgent:userAgent prevUserAgent:[CDVUserAgentUtil originalUserAgent] browserOptions: browserOptions];
         self.inAppBrowserViewController.navigationDelegate = self;
 
         if ([self.viewController conformsToProtocol:@protocol(CDVScreenOrientationDelegate)]) {
@@ -1264,10 +1265,7 @@ BOOL isExiting = FALSE;
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(shouldAutorotateToInterfaceOrientation:)]) {
-        return [self.orientationDelegate shouldAutorotateToInterfaceOrientation:interfaceOrientation];
-    }
-
+    (void)interfaceOrientation;
     return YES;
 }
 
